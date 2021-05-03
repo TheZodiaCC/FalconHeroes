@@ -3,18 +3,24 @@ modded class PlayerBase
 	override void OnConnect()
 	{
 		super.OnConnect();
-		
-		Man thisMan = this;
-		
+
 		//Init KillLogger
-		FalconHeroesLogger.initPlayerLog(thisMan.GetIdentity().GetId());
+		FalconHeroesLogger.initPlayerLog(this.GetIdentity().GetId());
 	}
 	
 	 override void EEKilled( Object killer )
     {
-		Man thisMan = this;
+		string playerID = this.GetIdentity().GetId();
 		
-        FalconHeroesLogger.handleDeath(thisMan.GetIdentity().GetId());
+		Weapon_Base weapon = Weapon_Base.Cast(killer);
+		
+		SurvivorBase killerSurvivor = SurvivorBase.Cast(weapon.GetHierarchyRootPlayer());
+		Man manKiller = killerSurvivor;
+		
+		string killerID = manKiller.GetIdentity().GetId();
+		
+        FalconHeroesLogger.handleDeath(playerID);
+		FalconHeroesLogger.handlePlayerKill(playerID, killerID);
 		
 		super.EEKilled(killer);
     }

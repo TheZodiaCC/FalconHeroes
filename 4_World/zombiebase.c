@@ -4,10 +4,10 @@ modded class ZombieBase extends DayZInfected
 	{
 		Weapon_Base weapon = Weapon_Base.Cast(killer);
 		
-		SurvivorBase killer_survivor = SurvivorBase.Cast(weapon.GetHierarchyRootPlayer());
-		Man man_killer = killer_survivor;
+		SurvivorBase killerSurvivor = SurvivorBase.Cast(weapon.GetHierarchyRootPlayer());
+		Man manKiller = killerSurvivor;
 
-		FalconHeroesLogger.handleKillZombie(man_killer.GetIdentity().GetId());
+		FalconHeroesLogger.handleKillZombie(manKiller.GetIdentity().GetId());
 		
 		super.EEKilled(killer);
 	}
