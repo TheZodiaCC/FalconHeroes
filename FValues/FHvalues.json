@@ -1,8 +1,21 @@
 {
-    "HummanityForKillingBandit": 0,
-    "HummanityForKillingHero": 0,
-    "HummanityForSurvivor": 0,
-    "HummanityForZed": 5,
-    "HummanityForBandit": -5000,
-    "HummanityForHero": 5000
+    "hummanityForKillingZed": 5,
+    "hummanityMultiplier": 0.5,
+    "hummanityLevels": [
+      {
+        "name": "Survivor",
+        "minHummanity": -5000,
+        "maxHummanity": 5000
+      },
+      {
+        "name": "Hero Lvl. 1",
+        "minHummanity": 5000,
+        "maxHummanity": 10000
+      },
+      {
+        "name": "Bandit Lvl. 1",
+        "minHummanity": -5000,
+        "maxHummanity": -10000
+      }
+    ]
 }

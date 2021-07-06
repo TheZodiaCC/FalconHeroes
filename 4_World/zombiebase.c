@@ -1,6 +1,6 @@
 modded class ZombieBase extends DayZInfected 
 {
-	void EEKilled( Object killer )
+	override void EEKilled( Object killer )
 	{
 		Weapon_Base weapon = Weapon_Base.Cast(killer);
 		

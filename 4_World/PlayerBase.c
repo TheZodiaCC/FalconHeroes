@@ -10,18 +10,21 @@ modded class PlayerBase
 	
 	 override void EEKilled( Object killer )
     {
-		string playerID = this.GetIdentity().GetId();
+		if (!CommitedSuicide()) 
+		{
+			string playerID = this.GetIdentity().GetId();
 		
-		Weapon_Base weapon = Weapon_Base.Cast(killer);
-		
-		SurvivorBase killerSurvivor = SurvivorBase.Cast(weapon.GetHierarchyRootPlayer());
-		Man manKiller = killerSurvivor;
-		
-		string killerID = manKiller.GetIdentity().GetId();
-		
-        FalconHeroesLogger.handleDeath(playerID);
-		FalconHeroesLogger.handlePlayerKill(playerID, killerID);
-		
-		super.EEKilled(killer);
+			Weapon_Base weapon = Weapon_Base.Cast(killer);
+			
+			SurvivorBase killerSurvivor = SurvivorBase.Cast(weapon.GetHierarchyRootPlayer());
+			Man manKiller = killerSurvivor;
+			
+			string killerID = manKiller.GetIdentity().GetId();
+			
+	        FalconHeroesLogger.handleDeath(playerID);
+			FalconHeroesLogger.handlePlayerKill(playerID, killerID);
+			
+			super.EEKilled(killer);
+		}
     }
 }
