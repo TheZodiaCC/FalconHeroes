@@ -1,7 +1,72 @@
 class FalconHeroesLogger
 {
 	const static string logsRoot = "$profile:/FH/";
-	const static string hummanityValues = "$profile:/FValues/FHvalues.json";
+	const static string hummanityValuesPath = "$profile:/FValues/FHvalues.json";
+	
+	
+	static PlayerHummanityValues loadPlayerHummanityData(string playerID)
+	{
+		string playerJsonPath = logsRoot + playerID + ".json";
+		
+		if (FileExist(playerJsonPath))
+		{
+			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
+			
+			JsonFileLoader<PlayerHummanityValues>.JsonLoadFile(playerJsonPath, playerHummanityData);
+			
+			return playerHummanityData;
+		}	
+		
+		return null;
+	}
+	
+	static void savePlayerHummanityData(PlayerHummanityValues playerHummanityData, string playerID)
+	{
+		string playerJsonPath = logsRoot + playerID + ".json";
+		
+		if (FileExist(playerJsonPath))
+		{
+			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(playerJsonPath, playerHummanityData);
+		}	
+	}
+	
+	static HummanityValues loadHummanityValues()
+	{
+		if (FileExist(hummanityValuesPath))
+		{
+			HummanityValues hummanityValuesData = new HummanityValues();
+			
+			JsonFileLoader<HummanityValues>.JsonLoadFile(hummanityValuesPath, hummanityValuesData);
+			
+			return hummanityValuesData;
+		}
+		
+		return null;
+	}
+	
+	static string getHummanityLevel(int hummanity)
+	{
+		HummanityValues hummanityValuesData = loadHummanityValues();
+		
+		array<ref HummanityLevel> hummanityLevels = hummanityValuesData.getHummanityLevels();
+		int hummanityMax = 0;
+		int hummanityMin = 0;
+		string hummanityLevelName = "Survivor";
+
+		for (int i = 0; i < hummanityLevels.Count(); i++)
+		{
+			hummanityMax = hummanityLevels[i].getMaxHummanity();
+			hummanityMin = hummanityLevels[i].getMinHummanity();
+			hummanityLevelName = hummanityLevels[i].getName();
+			
+			if (hummanity <= hummanityMax && hummanity > hummanityMin)
+			{
+				break;
+			}
+		 }
+		
+		return hummanityLevelName;
+	}
 	
 	static string checkHummanityLevel(string playerID)
 	{
@@ -13,11 +78,9 @@ class FalconHeroesLogger
 			HummanityValues hummanityValuesData = new HummanityValues();
 			
 			JsonFileLoader<PlayerHummanityValues>.JsonLoadFile(playerJson, playerHummanityData);
-			JsonFileLoader<HummanityValues>.JsonLoadFile(hummanityValues, hummanityValuesData);
+			JsonFileLoader<HummanityValues>.JsonLoadFile(hummanityValuesPath, hummanityValuesData);
 			
-			foreach (HummanityLevel level : hummanityValuesData.getHummanityLevels()) {
-				Print(level.getName());
-			}
+			
 			return "Survivor";
 		}
 		else
@@ -28,84 +91,54 @@ class FalconHeroesLogger
 	
 	static void initPlayerLog(string playerID)
 	{
-		string fileName = logsRoot + playerID + ".json";
+		string playerJson = logsRoot + playerID + ".json";
 		
-		if (!FileExist(fileName))
+		if (!FileExist(playerJson))
 		{
-			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
+			PlayerHummanityValues playerHummanityData = loadPlayerHummanityData(playerID);
 			playerHummanityData.init();
-			
-			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(fileName, playerHummanityData);
+		
+			savePlayerHummanityData(playerHummanityData, playerID);
 		}
 	}
 	
 	static void handleKillZombie(string playerID) 
 	{
-		string fileName = logsRoot + playerID + ".json";
+		PlayerHummanityValues playerHummanityData = loadPlayerHummanityData(playerID);
+		HummanityValues hummanityValuesData = loadHummanityValues();
 		
-		if (FileExist(fileName))
-		{
-			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
-			HummanityValues hummanityValuesData = new HummanityValues();
-			
-			JsonFileLoader<PlayerHummanityValues>.JsonLoadFile(fileName, playerHummanityData);
-			JsonFileLoader<HummanityValues>.JsonLoadFile(hummanityValues, hummanityValuesData);
-			
-			playerHummanityData.setHummanity(playerHummanityData.getHummanity() + hummanityValuesData.getHummanityForKillingZed());	
-			playerHummanityData.setKilledZeds(playerHummanityData.getKilledZeds() + 1);		
-			
-			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(fileName, playerHummanityData);
-		}
+		playerHummanityData.setHummanity(playerHummanityData.getHummanity() + hummanityValuesData.getHummanityForKillingZed());	
+		playerHummanityData.setKilledZeds(playerHummanityData.getKilledZeds() + 1);
+		
+		string playerHummanityLevel = getHummanityLevel(playerHummanityData.getHummanity());
+		
+		playerHummanityData.setHummanityLevel(playerHummanityLevel);
+		
+		savePlayerHummanityData(playerHummanityData, playerID);
 	}
 	
 	static void handlePlayerKill(string victimID, string killerID) 
 	{
-		string killerFileName = logsRoot + killerID + ".json";
-		
 		if (victimID == killerID) 
 		{
 			return;
 		}
 		
-		if (FileExist(killerFileName))
-		{
-			string victimLevel = checkHummanityLevel(victimID);
-			string level;
-			
-			map<string, int> killerJsonData = new map<string, int>();
-			map<string, int> valuesJsonData = new map<string, int>();
-			
-			JsonFileLoader<map<string, int>>.JsonLoadFile(killerFileName, killerJsonData);
-			JsonFileLoader<map<string, int>>.JsonLoadFile(hummanityValues, valuesJsonData);
-			
-			int killerHummanity = killerJsonData.Get("Hummanity");
-			int killedPlayers = killerJsonData.Get("KilledPlayers");
-			
-			level = "HummanityForKilling" + victimLevel;
-			int hummanityForKillingPlayer = valuesJsonData.Get(level);
-			
-			killerHummanity += hummanityForKillingPlayer;			
-			
-			killerJsonData.Set("KilledPlayers", killedPlayers + 1);
-			killerJsonData.Set("Hummanity", killerHummanity);
-			
-			JsonFileLoader<map<string, int>>.JsonSaveFile(killerFileName, killerJsonData);
-		}
+		string victimLevel = checkHummanityLevel(victimID);
+		
+		PlayerHummanityValues killerHummanityData = loadPlayerHummanityData(killerID);
+		PlayerHummanityValues victimHummanityData = loadPlayerHummanityData(victimID);
+		
+		//TODO reimplement handling player kill
 	}
 	
 	static void handleDeath(string playerID) 
 	{
-		string fileName = logsRoot + playerID + ".json";
+
+		PlayerHummanityValues playerHummanityData = loadPlayerHummanityData(playerID);
 		
-		if (FileExist(fileName))
-		{
-			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
-			
-			JsonFileLoader<PlayerHummanityValues>.JsonLoadFile(fileName, playerHummanityData);	
-			
-			playerHummanityData.setDeaths(playerHummanityData.getDeaths() + 1);
-			
-			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(fileName, playerHummanityData);
-		}
+		playerHummanityData.setDeaths(playerHummanityData.getDeaths() + 1);
+		
+		savePlayerHummanityData(playerHummanityData, playerID);
 	}
 }

@@ -4,6 +4,7 @@ class PlayerHummanityValues
 	private int killedZeds;
 	private int hummanity;
 	private int deaths;
+	private string hummanityLevel;
 	
 	
 	void init() {
@@ -11,6 +12,7 @@ class PlayerHummanityValues
 		this.killedZeds = 0;
 		this.hummanity = 0;
 		this.deaths = 0;
+		this.hummanityLevel = "Survivor";
 	}
 	
 	int getKilledPlayers() {
@@ -27,6 +29,14 @@ class PlayerHummanityValues
 	
 	int getDeaths() {
 		return deaths;
+	}
+	
+	string getHummanityLevel() {
+		return hummanityLevel;
+	}
+	
+	void setHummanityLevel(string value) {
+		this.hummanityLevel = value;
 	}
 	
 	void setKilledPlayers(int value) {
