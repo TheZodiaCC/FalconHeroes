@@ -44,23 +44,33 @@ class FalconHeroesLogger
 		return null;
 	}
 	
-	static string getHummanityLevel(int hummanity)
+	static bool checkIfInRange(int min, int value, int max)
+	{
+		if (((value - min) * (max - value)) >= 0)
+        {
+        	return true;
+        }
+        
+        return false;
+	}
+	
+	static string getHummanityLevel(int hummanity, string currentHummanityLevel)
 	{
 		HummanityValues hummanityValuesData = loadHummanityValues();
 		
 		array<ref HummanityLevel> hummanityLevels = hummanityValuesData.getHummanityLevels();
-		int hummanityMax = 0;
-		int hummanityMin = 0;
-		string hummanityLevelName = "Survivor";
+		int hummanityMax;
+		int hummanityMin;
+		string hummanityLevelName = currentHummanityLevel;
 
 		for (int i = 0; i < hummanityLevels.Count(); i++)
 		{
 			hummanityMax = hummanityLevels[i].getMaxHummanity();
 			hummanityMin = hummanityLevels[i].getMinHummanity();
-			hummanityLevelName = hummanityLevels[i].getName();
 			
-			if (hummanity <= hummanityMax && hummanity > hummanityMin)
+			if (checkIfInRange(hummanityMin, hummanity, hummanityMax)) 
 			{
+				hummanityLevelName = hummanityLevels[i].getName();
 				break;
 			}
 		 }
@@ -68,37 +78,16 @@ class FalconHeroesLogger
 		return hummanityLevelName;
 	}
 	
-	static string checkHummanityLevel(string playerID)
-	{
-		string playerJson = logsRoot + playerID + ".json";
-		
-		if (FileExist(playerJson))
-		{
-			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
-			HummanityValues hummanityValuesData = new HummanityValues();
-			
-			JsonFileLoader<PlayerHummanityValues>.JsonLoadFile(playerJson, playerHummanityData);
-			JsonFileLoader<HummanityValues>.JsonLoadFile(hummanityValuesPath, hummanityValuesData);
-			
-			
-			return "Survivor";
-		}
-		else
-		{
-			return "Survivor";
-		}
-	}
-	
 	static void initPlayerLog(string playerID)
 	{
 		string playerJson = logsRoot + playerID + ".json";
-		
+	
 		if (!FileExist(playerJson))
 		{
-			PlayerHummanityValues playerHummanityData = loadPlayerHummanityData(playerID);
+			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
 			playerHummanityData.init();
 		
-			savePlayerHummanityData(playerHummanityData, playerID);
+			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(playerJson, playerHummanityData);
 		}
 	}
 	
@@ -110,7 +99,7 @@ class FalconHeroesLogger
 		playerHummanityData.setHummanity(playerHummanityData.getHummanity() + hummanityValuesData.getHummanityForKillingZed());	
 		playerHummanityData.setKilledZeds(playerHummanityData.getKilledZeds() + 1);
 		
-		string playerHummanityLevel = getHummanityLevel(playerHummanityData.getHummanity());
+		string playerHummanityLevel = getHummanityLevel(playerHummanityData.getHummanity(), playerHummanityData.getHummanityLevel());
 		
 		playerHummanityData.setHummanityLevel(playerHummanityLevel);
 		
@@ -124,12 +113,18 @@ class FalconHeroesLogger
 			return;
 		}
 		
-		string victimLevel = checkHummanityLevel(victimID);
+		HummanityValues hummanityValuesData = loadHummanityValues();
 		
 		PlayerHummanityValues killerHummanityData = loadPlayerHummanityData(killerID);
 		PlayerHummanityValues victimHummanityData = loadPlayerHummanityData(victimID);
 		
-		//TODO reimplement handling player kill
+		int newHummanity = -(victimHummanityData.getHummanity() * hummanityValuesData.getHummanityMultiplier());
+		
+		killerHummanityData.setKilledPlayers(killerHummanityData.getKilledPlayers() + 1);
+		killerHummanityData.setHummanity(killerHummanityData.getHummanity() + newHummanity);
+		killerHummanityData.setHummanityLevel(getHummanityLevel(killerHummanityData.getHummanity(), killerHummanityData.getHummanityLevel()));
+		
+		savePlayerHummanityData(killerHummanityData, killerID);
 	}
 	
 	static void handleDeath(string playerID) 

@@ -36,22 +36,22 @@ class PlayerHummanityValues
 	}
 	
 	void setHummanityLevel(string value) {
-		this.hummanityLevel = value;
+		hummanityLevel = value;
 	}
 	
 	void setKilledPlayers(int value) {
-		this.killedPlayers+= value;
+		killedPlayers = value;
 	}
 	
 	void setKilledZeds(int value) {
-		this.killedZeds = value;
+		killedZeds = value;
 	}
 	
 	void setHummanity(int value) {
-		this.hummanity = value;
+		hummanity = value;
 	}
 	
 	void setDeaths(int value) {
-		this.deaths = value;
+		deaths = value;
 	}
 }
