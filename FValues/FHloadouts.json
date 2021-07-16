@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Survivor",
+    "headItems": [
+      ""
+    ],
+    "bodyItems": [
+      ""
+    ],
+    "pantsItems": [
+      "Jeans_Black"
+    ],
+    "bootsItems": [
+      "WorkingBoots_Brown"
+    ],
+    "items": [
+      "KitchenKnife"
+    ]
+  },
+  {
+    "name": "Hero Lvl. 1",
+    "headItems": [
+      ""
+    ],
+    "bodyItems": [
+      "BomberJacket_Black"
+    ],
+    "pantsItems": [
+      "Jeans_Black"
+    ],
+    "bootsItems": [
+      "WorkingBoots_Brown"
+    ],
+    "items": [
+      "Plum"
+    ]
+  }
+]

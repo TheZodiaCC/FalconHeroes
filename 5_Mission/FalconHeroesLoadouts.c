@@ -1,180 +1,68 @@
 class FalconHeroesLoadouts
 {
-	const static string hummanityValues = "$profile:/FValues/FHvalues.json";
-	const static string playersHummanityPath = "$profile:/FH/";
+	static ref array<ref HummanityLoadout> loadLoadoutsData() {
+		const string loadoutsPath = "$profile:/FValues/FHloadouts.json";
+		
+		ref array<ref HummanityLoadout> hummanityLoadouts = new ref array<ref HummanityLoadout>();
+		
+		JsonFileLoader<ref array<ref HummanityLoadout>>.JsonLoadFile(loadoutsPath, hummanityLoadouts);
+		
+		return hummanityLoadouts;
+	}
+	
+	static HummanityLoadout getLoadout(string playerHummanityLevel, ref array<ref HummanityLoadout> hummanityLoadouts) {
+		for (int i = 0; i < hummanityLoadouts.Count(); i++) {
+			if (hummanityLoadouts[i].getName() == playerHummanityLevel) {
+				return hummanityLoadouts[i];
+			}
+		}
+		
+		return null;
+	}
 	
 	static void spawnLoadout(PlayerBase player)
 	{
 		string playerID = player.GetIdentity().GetId();
+		string playerHummanityLevel;
+		array<ref HummanityLoadout> hummanityLoadouts;
+		HummanityLoadout playerLoadout;
+		array<string> bodyItems;
+		array<string> pantsItems;
+		array<string> bootsItems;
+		array<string> items;
 		
-		map<string, int> playerData = new map<string, int>();
-		map<string, int> hummanityLevels = new map<string, int>();
+		string bodyItem;
+		string pantsItem;
+		string bootsItem;
 		
-		string playerJson = playersHummanityPath + playerID + ".json";
+		PlayerHummanityValues playerHummanityData = FalconHeroesLogger.loadPlayerHummanityData(playerID);
+		playerHummanityLevel = playerHummanityData.getHummanityLevel();
 		
-		if (FileExist(playerJson))
-		{
-			JsonFileLoader<map<string, int>>.JsonLoadFile(playerJson, playerData);
-			JsonFileLoader<map<string, int>>.JsonLoadFile(hummanityValues, hummanityLevels);
-			
-			int hummanityForBandit = hummanityLevels.Get("HummanityForBandit");
-			int hummanityForHero = hummanityLevels.Get("HummanityForHero");
-			int playerHummanity = playerData.Get("Hummanity");
-			
+		hummanityLoadouts = loadLoadoutsData();
+		
+		playerLoadout = getLoadout(playerHummanityLevel, hummanityLoadouts);
+		
+		if (playerLoadout != null) {
 			player.RemoveAllItems();
+		
+			bodyItems = playerLoadout.getBodyItems();
+			bodyItem = bodyItems[Math.RandomInt(0, bodyItems.Count())];
 			
-			if ((playerHummanity < hummanityForHero) && (playerHummanity > hummanityForBandit))
-			{
-				spawnSurvivorLoadout(player);
+			pantsItems = playerLoadout.getPantsItems();
+			pantsItem = pantsItems[Math.RandomInt(0, pantsItems.Count())];
+			
+			bootsItems = playerLoadout.getBootsItems();
+			bootsItem = bootsItems[Math.RandomInt(0, bootsItems.Count())];
+			
+			items = playerLoadout.getItems();
+			
+			player.GetInventory().CreateInInventory(bodyItem);
+			player.GetInventory().CreateInInventory(pantsItem);
+			player.GetInventory().CreateInInventory(bootsItem);
+			
+			foreach (string item : items) {
+				player.GetInventory().CreateInInventory(item);
 			}
-			else if (playerHummanity >= hummanityForHero)
-			{
-				spawnHeroLoadout(player);
-			}
-			else
-			{
-				spawnBanditLoadout(player);
-			}
-		}
-		else
-		{
-			return;
 		}
 	}
-	
-	static void spawnSurvivorLoadout(PlayerBase player)
-	{
-		EntityAI itemClothing = player.FindAttachmentBySlotName("Body");
-		EntityAI itemEnt;
-		ItemBase itemBs;
-		
-		string body;
-		string pants;
-		string boots;
-		int rndIndex;
-
-		string tshirtArray[] = {"TShirt_Black", "TShirt_Blue", "TShirt_Green", "TShirt_Red"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		body = tshirtArray[rndIndex];
-		
-		string pantsArray[] = {"Jeans_Black", "Jeans_Blue", "Jeans_Green", "Jeans_Brown"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		pants = pantsArray[rndIndex];
-		
-		string bootsArray[] = {"AthleticShoes_Black", "AthleticShoes_Blue", "AthleticShoes_Green", "AthleticShoes_Brown"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		boots = bootsArray[rndIndex];
-		
-		player.GetInventory().CreateInInventory(body);
-		player.GetInventory().CreateInInventory(pants);
-		player.GetInventory().CreateInInventory(boots);
-		
-		player.GetInventory().CreateInInventory("Plum");
-		player.GetInventory().CreateInInventory("Roadflare");
-		
-		itemEnt = itemClothing.GetInventory().CreateInInventory("Rag");
-		
-		if (Class.CastTo(itemBs, itemEnt))
-		{
-			itemBs.SetQuantity(3);
-		}
-	}
-	
-	static void spawnHeroLoadout(PlayerBase player)
-	{
-		EntityAI itemClothing = player.FindAttachmentBySlotName("Body");
-		EntityAI itemEnt;
-		ItemBase itemBs;
-		
-		string body;
-		string pants;
-		string boots;
-		int rndIndex;
-
-		string tshirtArray[] = {"TacticalShirt_Black", "TacticalShirt_Grey", "TacticalShirt_Olive", "TacticalShirt_Tan"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		body = tshirtArray[rndIndex];
-		
-		string pantsArray[] = {"CargoPants_Black", "CargoPants_Blue", "CargoPants_Green", "CargoPants_Grey"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		pants = pantsArray[rndIndex];
-		
-		string bootsArray[] = {"CombatBoots_Black", "CombatBoots_Brown", "CombatBoots_Green", "CombatBoots_Grey"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		boots = bootsArray[rndIndex];
-		
-		player.GetInventory().CreateInInventory(body);
-		player.GetInventory().CreateInInventory(pants);
-		player.GetInventory().CreateInInventory(boots);
-		
-		player.GetInventory().CreateInInventory("BakedBeansCan");
-		player.GetInventory().CreateInInventory("WaterBottle");
-		player.GetInventory().CreateInInventory("PersonalRadio");
-		player.GetInventory().CreateInInventory("Battery9V");
-		player.GetInventory().CreateInInventory("BandageDressing");
-		player.GetInventory().CreateInInventory("PoliceVest");
-		player.GetInventory().CreateInInventory("Compass");
-		player.GetInventory().CreateInInventory("HuntingKnife");
-		player.GetInventory().CreateInInventory("CourierBag");
-		player.GetInventory().CreateInInventory("Roadflare");
-		player.GetInventory().CreateInInventory("Roadflare");
-		
-		itemEnt = itemClothing.GetInventory().CreateInInventory("Rag");
-		
-		if (Class.CastTo(itemBs, itemEnt))
-		{
-			itemBs.SetQuantity(6);
-		}
-	}
-	
-	static void spawnBanditLoadout(PlayerBase player)
-	{
-		EntityAI itemClothing = player.FindAttachmentBySlotName("Body");
-		EntityAI itemEnt;
-		ItemBase itemBs;
-		
-		string body;
-		string pants;
-		string boots;
-		int rndIndex;
-
-		string tshirtArray[] = {"BomberJacket_Black", "BomberJacket_Blue", "BomberJacket_Olive", "BomberJacket_Maroon"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		body = tshirtArray[rndIndex];
-		
-		string pantsArray[] = {"Jeans_Black", "Jeans_Blue", "Jeans_Green", "Jeans_Brown"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		pants = pantsArray[rndIndex];
-		
-		string bootsArray[] = {"WorkingBoots_Brown", "WorkingBoots_Grey", "WorkingBoots_Beige", "WorkingBoots_Green"};
-		rndIndex = Math.RandomInt(0, 4);
-		
-		boots = bootsArray[rndIndex];
-		
-		player.GetInventory().CreateInInventory(body);
-		player.GetInventory().CreateInInventory(pants);
-		player.GetInventory().CreateInInventory(boots);
-		
-		player.GetInventory().CreateInInventory("Plum");
-		player.GetInventory().CreateInInventory("BandageDressing");
-		player.GetInventory().CreateInInventory("TunaCan");
-		player.GetInventory().CreateInInventory("KitchenKnife");
-		player.GetInventory().CreateInInventory("Roadflare");
-		player.GetInventory().CreateInInventory("Roadflare");
-		
-		itemEnt = itemClothing.GetInventory().CreateInInventory("Rag");
-		
-		if (Class.CastTo(itemBs, itemEnt))
-		{
-			itemBs.SetQuantity(6);
-		}
-	}
-}
+}	
