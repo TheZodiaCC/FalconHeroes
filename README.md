@@ -16,4 +16,4 @@ Hummanity System for unreleased `FalconModPack` for `DayZ 1.11`.
 - Configurable loadouts baset on hummanity level
 
 ### Key Bindings
-- `M` Turn On/Off player Monitor (provided by `FalconPlayerMonitor`)
+- `M` Turn On/Off player Monitor (provided by `FalconMonitor`)
