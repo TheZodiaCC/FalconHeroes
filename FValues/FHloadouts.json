@@ -5,17 +5,15 @@
       ""
     ],
     "bodyItems": [
-      ""
+      "TShirt_Green"
     ],
     "pantsItems": [
       "Jeans_Black"
     ],
     "bootsItems": [
-      "WorkingBoots_Brown"
+      "AthleticShoes_Black"
     ],
-    "items": [
-      "KitchenKnife"
-    ]
+    "items": []
   },
   {
     "name": "Hero Lvl. 1",
@@ -24,6 +22,24 @@
     ],
     "bodyItems": [
       "BomberJacket_Black"
+    ],
+    "pantsItems": [
+      "Jeans_Black"
+    ],
+    "bootsItems": [
+      "WorkingBoots_Brown"
+    ],
+    "items": [
+      "Plum"
+    ]
+  },
+  {
+    "name": "Bandit Lvl. 1",
+    "headItems": [
+      ""
+    ],
+    "bodyItems": [
+      "BomberJacket_Olive"
     ],
     "pantsItems": [
       "Jeans_Black"
