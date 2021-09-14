@@ -1,19 +1,19 @@
 class FalconHeroesLoadouts
 {
-	static ref array<ref HummanityLoadout> loadLoadoutsData() {
+	static ref array<ref HumanityLoadout> loadLoadoutsData() {
 		const string loadoutsPath = "$profile:/FValues/FHloadouts.json";
 		
-		ref array<ref HummanityLoadout> hummanityLoadouts = new ref array<ref HummanityLoadout>();
+		ref array<ref HumanityLoadout> humanityLoadouts = new ref array<ref HumanityLoadout>();
 		
-		JsonFileLoader<ref array<ref HummanityLoadout>>.JsonLoadFile(loadoutsPath, hummanityLoadouts);
+		JsonFileLoader<ref array<ref HumanityLoadout>>.JsonLoadFile(loadoutsPath, humanityLoadouts);
 		
-		return hummanityLoadouts;
+		return humanityLoadouts;
 	}
 	
-	static HummanityLoadout getLoadout(string playerHummanityLevel, ref array<ref HummanityLoadout> hummanityLoadouts) {
-		for (int i = 0; i < hummanityLoadouts.Count(); i++) {
-			if (hummanityLoadouts[i].getName() == playerHummanityLevel) {
-				return hummanityLoadouts[i];
+	static HumanityLoadout getLoadout(string playerHumanityLevel, ref array<ref HumanityLoadout> humanityLoadouts) {
+		for (int i = 0; i < humanityLoadouts.Count(); i++) {
+			if (humanityLoadouts[i].getName() == playerHumanityLevel) {
+				return humanityLoadouts[i];
 			}
 		}
 		
@@ -23,9 +23,9 @@ class FalconHeroesLoadouts
 	static void spawnLoadout(PlayerBase player)
 	{
 		string playerID = player.GetIdentity().GetId();
-		string playerHummanityLevel;
-		array<ref HummanityLoadout> hummanityLoadouts;
-		HummanityLoadout playerLoadout;
+		string playerHumanityLevel;
+		array<ref HumanityLoadout> humanityLoadouts;
+		HumanityLoadout playerLoadout;
 		array<string> bodyItems;
 		array<string> pantsItems;
 		array<string> bootsItems;
@@ -35,12 +35,14 @@ class FalconHeroesLoadouts
 		string pantsItem;
 		string bootsItem;
 		
-		PlayerHummanityValues playerHummanityData = FalconHeroesLogger.loadPlayerHummanityData(playerID);
-		playerHummanityLevel = playerHummanityData.getHummanityLevel();
+		string item;
 		
-		hummanityLoadouts = loadLoadoutsData();
+		PlayerHumanityValues playerHumanityData = FalconHeroesLogger.loadPlayerHumanityData(playerID);
+		playerHumanityLevel = playerHumanityData.getHumanityLevel();
 		
-		playerLoadout = getLoadout(playerHummanityLevel, hummanityLoadouts);
+		humanityLoadouts = loadLoadoutsData();
+		
+		playerLoadout = getLoadout(playerHumanityLevel, humanityLoadouts);
 		
 		if (playerLoadout != null) {
 			player.RemoveAllItems();
@@ -60,7 +62,10 @@ class FalconHeroesLoadouts
 			player.GetInventory().CreateInInventory(pantsItem);
 			player.GetInventory().CreateInInventory(bootsItem);
 			
-			foreach (string item : items) {
+			for (int i = 0; i < items.Count(); i++)
+			{
+				item = items[i];
+				
 				player.GetInventory().CreateInInventory(item);
 			}
 		}

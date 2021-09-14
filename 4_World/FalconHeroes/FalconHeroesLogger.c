@@ -1,81 +1,125 @@
 class FalconHeroesLogger
 {
 	const static string logsRoot = "$profile:/FH/";
-	const static string hummanityValuesPath = "$profile:/FValues/FHvalues.json";
+	const static string humanityValuesPath = "$profile:/FValues/FHvalues.json";
 	
 	
-	static PlayerHummanityValues loadPlayerHummanityData(string playerID)
+	static PlayerHumanityValues loadPlayerHumanityData(string playerID)
 	{
 		string playerJsonPath = logsRoot + playerID + ".json";
 		
 		if (FileExist(playerJsonPath))
 		{
-			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
+			PlayerHumanityValues playerHumanityData = new PlayerHumanityValues();
 			
-			JsonFileLoader<PlayerHummanityValues>.JsonLoadFile(playerJsonPath, playerHummanityData);
+			JsonFileLoader<PlayerHumanityValues>.JsonLoadFile(playerJsonPath, playerHumanityData);
 			
-			return playerHummanityData;
+			return playerHumanityData;
 		}	
 		
 		return null;
 	}
 	
-	static void savePlayerHummanityData(PlayerHummanityValues playerHummanityData, string playerID)
+	static int getPlayerHumanity(string playerId)
+	{
+		PlayerHumanityValues humanityValues = loadPlayerHumanityData(playerId);
+		
+		if (humanityValues)
+		{
+			return humanityValues.getHumanity(); 
+		}	
+		
+		return 0;
+	}
+	
+	static HumanityLevel getHumanityLevelByName(string levelName)
+	{
+		HumanityValues humanityValuesData = loadHumanityValues();
+		array<ref HumanityLevel> humanityLevels = new array<ref HumanityLevel>();
+		HumanityLevel level;
+		
+		humanityLevels = humanityValuesData.getHumanityLevels();
+		
+		for (int i = 0; i < humanityLevels.Count(); i++)
+		{
+			if (humanityLevels[i].getName() == levelName)
+			{
+				level = humanityLevels[i];
+				
+				break;
+			}
+		}
+		
+		return level;
+	}
+	
+	static int getHumanityMultiplier(PlayerHumanityValues killerHumanityData, PlayerHumanityValues victimHumanityData)
+	{
+		HumanityLevel killerLevel = getHumanityLevelByName(killerHumanityData.getHumanityLevel());
+		HumanityLevel victimLevel = getHumanityLevelByName(victimHumanityData.getHumanityLevel());
+		
+		int victimHumanity = victimHumanityData.getHumanity();
+		int humanityMultiplier = 1;
+		
+		if (victimHumanity >= 0)
+		{
+			humanityMultiplier = killerLevel.getPositiveHumanityMultiplier();
+		}
+		else
+		{
+			humanityMultiplier = killerLevel.getNegativeHumanityMultiplier();
+		}
+		
+		return humanityMultiplier;
+	}
+	
+	static void savePlayerHumanityData(PlayerHumanityValues playerHumanityData, string playerID)
 	{
 		string playerJsonPath = logsRoot + playerID + ".json";
 		
 		if (FileExist(playerJsonPath))
 		{
-			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(playerJsonPath, playerHummanityData);
+			JsonFileLoader<PlayerHumanityValues>.JsonSaveFile(playerJsonPath, playerHumanityData);
 		}	
 	}
 	
-	static HummanityValues loadHummanityValues()
+	static HumanityValues loadHumanityValues()
 	{
-		if (FileExist(hummanityValuesPath))
+		if (FileExist(humanityValuesPath))
 		{
-			HummanityValues hummanityValuesData = new HummanityValues();
+			HumanityValues humanityValuesData = new HumanityValues();
 			
-			JsonFileLoader<HummanityValues>.JsonLoadFile(hummanityValuesPath, hummanityValuesData);
+			JsonFileLoader<HumanityValues>.JsonLoadFile(humanityValuesPath, humanityValuesData);
 			
-			return hummanityValuesData;
+			return humanityValuesData;
 		}
 		
 		return null;
 	}
 	
-	static bool checkIfInRange(int min, int value, int max)
+	static string getHumanityLevel(int humanity, string currentHumanityLevel)
 	{
-		if (((value - min) * (max - value)) >= 0)
-        {
-        	return true;
-        }
-        
-        return false;
-	}
-	
-	static string getHummanityLevel(int hummanity, string currentHummanityLevel)
-	{
-		HummanityValues hummanityValuesData = loadHummanityValues();
+		HumanityValues humanityValuesData = loadHumanityValues();
+		array<ref HumanityLevel> humanityLevels = new array<ref HumanityLevel>();
 		
-		array<ref HummanityLevel> hummanityLevels = hummanityValuesData.getHummanityLevels();
-		int hummanityMax;
-		int hummanityMin;
-		string hummanityLevelName = currentHummanityLevel;
+		humanityLevels = humanityValuesData.getHumanityLevels();
+		int humanityMax;
+		int humanityMin;
+		string humanityLevelName = currentHumanityLevel;
 
-		for (int i = 0; i < hummanityLevels.Count(); i++)
+		for (int i = 0; i < humanityLevels.Count(); i++)
 		{
-			hummanityMax = hummanityLevels[i].getMaxHummanity();
-			hummanityMin = hummanityLevels[i].getMinHummanity();
+			humanityMax = humanityLevels[i].getMaxHumanity();
+			humanityMin = humanityLevels[i].getMinHumanity();
 			
-			if (checkIfInRange(hummanityMin, hummanity, hummanityMax)) 
+			if (humanity.InRange(humanityMin, humanityMax))
 			{
-				hummanityLevelName = hummanityLevels[i].getName();
+				humanityLevelName = humanityLevels[i].getName();
 				break;
 			}
 		 }
 		
-		return hummanityLevelName;
+		return humanityLevelName;
 	}
 	
 	static void initPlayerLog(string playerID)
@@ -84,26 +128,28 @@ class FalconHeroesLogger
 	
 		if (!FileExist(playerJson))
 		{
-			PlayerHummanityValues playerHummanityData = new PlayerHummanityValues();
-			playerHummanityData.init();
+			PlayerHumanityValues playerHumanityData = new PlayerHumanityValues();
+			playerHumanityData.init();
 		
-			JsonFileLoader<PlayerHummanityValues>.JsonSaveFile(playerJson, playerHummanityData);
+			JsonFileLoader<PlayerHumanityValues>.JsonSaveFile(playerJson, playerHumanityData);
 		}
 	}
 	
 	static void handleKillZombie(string playerID) 
 	{
-		PlayerHummanityValues playerHummanityData = loadPlayerHummanityData(playerID);
-		HummanityValues hummanityValuesData = loadHummanityValues();
+		PlayerHumanityValues playerHumanityData = loadPlayerHumanityData(playerID);
+		HumanityValues humanityValuesData = loadHumanityValues();
 		
-		playerHummanityData.setHummanity(playerHummanityData.getHummanity() + hummanityValuesData.getHummanityForKillingZed());	
-		playerHummanityData.setKilledZeds(playerHummanityData.getKilledZeds() + 1);
+		int newHumanity = playerHumanityData.getHumanity() + humanityValuesData.getHumanityForKillingZed();
 		
-		string playerHummanityLevel = getHummanityLevel(playerHummanityData.getHummanity(), playerHummanityData.getHummanityLevel());
+		playerHumanityData.setHumanity(newHumanity);	
+		playerHumanityData.setKilledZeds(playerHumanityData.getKilledZeds() + 1);
 		
-		playerHummanityData.setHummanityLevel(playerHummanityLevel);
+		string playerHumanityLevel = getHumanityLevel(playerHumanityData.getHumanity(), playerHumanityData.getHumanityLevel());
 		
-		savePlayerHummanityData(playerHummanityData, playerID);
+		playerHumanityData.setHumanityLevel(playerHumanityLevel);
+		
+		savePlayerHumanityData(playerHumanityData, playerID);
 	}
 	
 	static void handlePlayerKill(string victimID, string killerID) 
@@ -113,27 +159,49 @@ class FalconHeroesLogger
 			return;
 		}
 		
-		HummanityValues hummanityValuesData = loadHummanityValues();
+		HumanityValues humanityValuesData = loadHumanityValues();
 		
-		PlayerHummanityValues killerHummanityData = loadPlayerHummanityData(killerID);
-		PlayerHummanityValues victimHummanityData = loadPlayerHummanityData(victimID);
+		PlayerHumanityValues killerHumanityData = loadPlayerHumanityData(killerID);
+		PlayerHumanityValues victimHumanityData = loadPlayerHumanityData(victimID);
 		
-		int newHummanity = -(victimHummanityData.getHummanity() * hummanityValuesData.getHummanityMultiplier());
+		int humanityMultiplier = getHumanityMultiplier(killerHumanityData, victimHumanityData);
 		
-		killerHummanityData.setKilledPlayers(killerHummanityData.getKilledPlayers() + 1);
-		killerHummanityData.setHummanity(killerHummanityData.getHummanity() + newHummanity);
-		killerHummanityData.setHummanityLevel(getHummanityLevel(killerHummanityData.getHummanity(), killerHummanityData.getHummanityLevel()));
+		int newHumanity = humanityMultiplier * (victimHumanityData.getHumanity() * humanityValuesData.getHumanityMultiplier());
 		
-		savePlayerHummanityData(killerHummanityData, killerID);
+		killerHumanityData.setKilledPlayers(killerHumanityData.getKilledPlayers() + 1);
+		killerHumanityData.setHumanity(killerHumanityData.getHumanity() + newHumanity);
+		killerHumanityData.setHumanityLevel(getHumanityLevel(killerHumanityData.getHumanity(), killerHumanityData.getHumanityLevel()));
+		
+		savePlayerHumanityData(killerHumanityData, killerID);
 	}
 	
 	static void handleDeath(string playerID) 
 	{
 
-		PlayerHummanityValues playerHummanityData = loadPlayerHummanityData(playerID);
+		PlayerHumanityValues playerHumanityData = loadPlayerHumanityData(playerID);
 		
-		playerHummanityData.setDeaths(playerHummanityData.getDeaths() + 1);
+		playerHumanityData.setDeaths(playerHumanityData.getDeaths() + 1);
 		
-		savePlayerHummanityData(playerHummanityData, playerID);
+		savePlayerHumanityData(playerHumanityData, playerID);
+	}
+	
+	static PlayerBase getPlayerById(string playerId)
+	{
+	    array<Man> players = new array<Man>();
+		PlayerBase player;
+		
+		GetGame().GetPlayers(players);
+		
+		for (int i = 0; i < players.Count(); i++)
+		{
+			player = PlayerBase.Cast(players[i]);
+			
+			if (playerId == player.GetIdentity().GetId())
+			{
+				return player;
+			}
+		}
+		
+		return null;
 	}
 }

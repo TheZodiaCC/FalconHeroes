@@ -1,4 +1,4 @@
-class HummanityLoadout
+class HumanityLoadout
 {
 	private string name;
 	private ref array<string> headItems = new ref array<string>();

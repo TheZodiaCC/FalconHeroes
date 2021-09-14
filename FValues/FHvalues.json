@@ -1,21 +1,27 @@
 {
-    "hummanityForKillingZed": 5,
-    "hummanityMultiplier": 0.5,
-    "hummanityLevels": [
+    "humanityForKillingZed": 5,
+    "humanityMultiplier": 0.3,
+    "humanityLevels": [
       {
         "name": "Survivor",
-        "minHummanity": -5000,
-        "maxHummanity": 5000
+        "negativeHumanityMultiplier": 1,
+        "positiveHumanityMultiplier": -1,
+        "minHumanity": -5000,
+        "maxHumanity": 5000
       },
       {
         "name": "Hero Lvl. 1",
-        "minHummanity": 5000,
-        "maxHummanity": 10000
+        "negativeHumanityMultiplier": -1,
+        "positiveHumanityMultiplier": -1,
+        "minHumanity": 5000,
+        "maxHumanity": 10000
       },
       {
         "name": "Bandit Lvl. 1",
-        "minHummanity": -5000,
-        "maxHummanity": -10000
+        "negativeHumanityMultiplier": 1,
+        "positiveHumanityMultiplier": -1,
+        "minHumanity": -10000,
+        "maxHumanity": -5000
       }
     ]
 }
