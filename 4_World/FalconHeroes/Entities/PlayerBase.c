@@ -1,3 +1,6 @@
+#define FALCON_MISSIONS
+
+
 modded class PlayerBase
 {
 	override void OnConnect()
@@ -8,23 +11,34 @@ modded class PlayerBase
 		FalconHeroesLogger.initPlayerLog(this.GetIdentity().GetId());
 	}
 	
-	 override void EEKilled( Object killer )
+	override void EEKilled(Object killer)
     {
-		if (!CommitedSuicide()) 
-		{
-			string playerID = this.GetIdentity().GetId();
+		Weapon_Base weapon = Weapon_Base.Cast(killer);
 		
-			Weapon_Base weapon = Weapon_Base.Cast(killer);
+		Man manKiller = Man.Cast(weapon.GetHierarchyRootPlayer());
+		string killerID;
+		
+		if (this.IsInherited(FalconAI))
+		{
+			killerID = manKiller.GetIdentity().GetId();
 			
-			SurvivorBase killerSurvivor = SurvivorBase.Cast(weapon.GetHierarchyRootPlayer());
-			Man manKiller = killerSurvivor;
+			FalconAI fAI = FalconAI.Cast(this);
 			
-			string killerID = manKiller.GetIdentity().GetId();
-			
-	        FalconHeroesLogger.handleDeath(playerID);
-			FalconHeroesLogger.handlePlayerKill(playerID, killerID);
-			
-			super.EEKilled(killer);
+			FalconHeroesLogger.handleFAIKill(killerID, fAI.getMissionLVL(), fAI.getMissionType());
 		}
+		else
+		{
+			if (!CommitedSuicide()) 
+			{
+				string playerID = this.GetIdentity().GetId();
+				
+				killerID = manKiller.GetIdentity().GetId();
+				
+		        FalconHeroesLogger.handleDeath(playerID);
+				FalconHeroesLogger.handlePlayerKill(playerID, killerID);
+			}
+		}
+		
+		super.EEKilled(killer);
     }
 }

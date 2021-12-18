@@ -26,19 +26,25 @@ class CfgMods
 	    extra = 0;
 	    type = "mod";
 
-	    dependencies[] = {"World", "Mission" };
+	    dependencies[] = { "World", "Mission" };
 
 		class defs
 		{
 			class worldScriptModule
 			{
 				value = "";
-				files[] = {"FalconHeroes/4_World"};
+				files[] = {
+										"FalconHeroes/Defines",
+										"FalconHeroes/4_World"
+									};
 			};
 			class missionScriptModule
 			{
 				value = "";
-				files[] = {"FalconHeroes/5_Mission"};
+				files[] = {
+									"FalconHeroes/Defines",
+									"FalconHeroes/5_Mission"
+									};
 			};
 		};
 	};

@@ -1,7 +1,7 @@
 class FalconHeroesLogger
 {
-	const static string logsRoot = "$profile:/FH/";
-	const static string humanityValuesPath = "$profile:/FValues/FHvalues.json";
+	const static string logsRoot = HeroesConsts.HUMMANITY_LOGS_DATA_DIR_PATH;
+	const static string humanityValuesPath = HeroesConsts.HUMMANITY_VALUES_DATA_PATH;
 	
 	
 	static PlayerHumanityValues loadPlayerHumanityData(string playerID)
@@ -174,6 +174,32 @@ class FalconHeroesLogger
 		
 		savePlayerHumanityData(killerHumanityData, killerID);
 	}
+	
+	#ifdef FALCON_MISSIONS
+	static void handleFAIKill(string killerID, int missionLVL, string missionType) 
+	{
+		HumanityValues humanityValuesData = loadHumanityValues();
+		
+		PlayerHumanityValues killerHumanityData = loadPlayerHumanityData(killerID);
+		
+		int newHumanity = 0;
+		
+		if (missionType == FalconMissionsConsts.MISSION_TYPE_HEROES)
+		{
+			newHumanity = humanityValuesData.getHumanityForKillingHeroesAI() * missionLVL;
+		}
+		
+		else if (missionType == FalconMissionsConsts.MISSION_TYPE_BANDITS)
+		{
+			newHumanity = humanityValuesData.getHumanityForKillingBanditsAI() * missionLVL;
+		}
+		
+		killerHumanityData.setHumanity(killerHumanityData.getHumanity() + newHumanity);
+		killerHumanityData.setHumanityLevel(getHumanityLevel(killerHumanityData.getHumanity(), killerHumanityData.getHumanityLevel()));
+		
+		savePlayerHumanityData(killerHumanityData, killerID);
+	}
+	#endif
 	
 	static void handleDeath(string playerID) 
 	{

@@ -12,7 +12,7 @@ class PlayerHumanityValues
 		this.killedZeds = 0;
 		this.humanity = 2500;
 		this.deaths = 0;
-		this.humanityLevel = "Survivor";
+		this.humanityLevel = HeroesConsts.DEFAULT_HUMMANITY_LEVEL;
 	}
 	
 	int getKilledPlayers() {

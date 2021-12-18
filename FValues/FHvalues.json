@@ -1,5 +1,7 @@
 {
     "humanityForKillingZed": 5,
+    "humanityForKillingHeroesAI": -100,
+    "humanityForKillingBanditsAI": 100,
     "humanityMultiplier": 0.3,
     "humanityLevels": [
       {

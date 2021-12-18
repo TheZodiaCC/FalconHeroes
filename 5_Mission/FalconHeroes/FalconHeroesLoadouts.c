@@ -1,7 +1,7 @@
 class FalconHeroesLoadouts
 {
 	static ref array<ref HumanityLoadout> loadLoadoutsData() {
-		const string loadoutsPath = "$profile:/FValues/FHloadouts.json";
+		const string loadoutsPath = HeroesConsts.HUMMANITY_LOADOUTS_DATA_PATH;
 		
 		ref array<ref HumanityLoadout> humanityLoadouts = new ref array<ref HumanityLoadout>();
 		
