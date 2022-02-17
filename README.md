@@ -1,7 +1,7 @@
 # FalconHeroes
 
 ### Description
-Hummanity System for unreleased `FalconModPack` for `DayZ 1.11`.
+Hummanity System for unreleased `FalconModPack` for `DayZ 1.15`.
 (This mod works with `FalconAdminTools`)
 
 ### Setup
